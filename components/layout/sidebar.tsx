@@ -19,6 +19,7 @@ import {
   BarChart3,
   type LucideIcon,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface NavItem {
   title: string;
@@ -111,6 +112,7 @@ export function Sidebar({ role, userName, userEmail }: SidebarProps) {
             <p className="text-sm font-medium text-white truncate">{userName}</p>
             <p className="text-xs text-sidebar-muted truncate">{userEmail}</p>
           </div>
+          <ThemeToggle />
         </div>
         <form action="/api/auth/logout" method="POST">
           <button

@@ -28,6 +28,31 @@
   --sidebar-muted: #94a3b8;
 }
 
+.dark {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --primary: #10b981;
+  --primary-foreground: #ffffff;
+  --primary-hover: #059669;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #34d399;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #f8fafc;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #10b981;
+  --sidebar-bg: #020617;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-accent: #1e293b;
+  --sidebar-muted: #94a3b8;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -155,6 +180,16 @@ body {
   border-radius: var(--radius);
 }
 
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    #1e293b 25%,
+    #334155 50%,
+    #1e293b 75%
+  );
+  background-size: 200% 100%;
+}
+
 /* ─── Card Hover Effect ──────────────────────────────────────────── */
 
 .card-hover {
@@ -185,6 +220,12 @@ body {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
 }
 
+.dark .glass {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
 .glass-dark {
   background: rgba(2, 6, 23, 0.75);
   backdrop-filter: blur(20px);
@@ -199,17 +240,22 @@ body {
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
+.dark .glass-header {
+  background: rgba(2, 6, 23, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* ─── Mesh Gradients ─────────────────────────────────────────────── */
 
 .bg-mesh {
-  background-color: #f8fafc;
+  background-color: var(--background);
   background-image: 
     radial-gradient(at 0% 0%, hsla(160, 100%, 94%, 0.7) 0px, transparent 50%),
     radial-gradient(at 100% 0%, hsla(210, 100%, 95%, 0.7) 0px, transparent 50%);
 }
 
-.bg-mesh-dark {
-  background-color: #020617;
+.dark .bg-mesh {
+  background-color: var(--background);
   background-image: 
     radial-gradient(at 0% 0%, hsla(160, 50%, 15%, 0.5) 0px, transparent 50%),
     radial-gradient(at 100% 100%, hsla(210, 50%, 15%, 0.5) 0px, transparent 50%);
@@ -222,11 +268,21 @@ body {
   color: #92400e;
   border: 1px solid #fcd34d;
 }
+.dark .badge-pending {
+  background: rgba(252, 211, 77, 0.1);
+  color: #fcd34d;
+  border-color: rgba(252, 211, 77, 0.2);
+}
 
 .badge-under-review {
   background: #dbeafe;
   color: #1e40af;
   border: 1px solid #93c5fd;
+}
+.dark .badge-under-review {
+  background: rgba(147, 197, 253, 0.1);
+  color: #93c5fd;
+  border-color: rgba(147, 197, 253, 0.2);
 }
 
 .badge-approved {
@@ -234,11 +290,21 @@ body {
   color: #065f46;
   border: 1px solid #6ee7b7;
 }
+.dark .badge-approved {
+  background: rgba(110, 231, 183, 0.1);
+  color: #6ee7b7;
+  border-color: rgba(110, 231, 183, 0.2);
+}
 
 .badge-rejected {
   background: #fee2e2;
   color: #991b1b;
   border: 1px solid #fca5a5;
+}
+.dark .badge-rejected {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.2);
 }
 
 .badge-active {
@@ -246,11 +312,21 @@ body {
   color: #065f46;
   border: 1px solid #6ee7b7;
 }
+.dark .badge-active {
+  background: rgba(110, 231, 183, 0.1);
+  color: #6ee7b7;
+  border-color: rgba(110, 231, 183, 0.2);
+}
 
 .badge-closed {
   background: #f1f5f9;
   color: #475569;
   border: 1px solid #cbd5e1;
+}
+.dark .badge-closed {
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
 .badge-delinquent {
@@ -258,11 +334,21 @@ body {
   color: #991b1b;
   border: 1px solid #fca5a5;
 }
+.dark .badge-delinquent {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.2);
+}
 
 .badge-due {
   background: #fef3c7;
   color: #92400e;
   border: 1px solid #fcd34d;
+}
+.dark .badge-due {
+  background: rgba(252, 211, 77, 0.1);
+  color: #fcd34d;
+  border-color: rgba(252, 211, 77, 0.2);
 }
 
 .badge-paid {
@@ -270,11 +356,21 @@ body {
   color: #065f46;
   border: 1px solid #6ee7b7;
 }
+.dark .badge-paid {
+  background: rgba(110, 231, 183, 0.1);
+  color: #6ee7b7;
+  border-color: rgba(110, 231, 183, 0.2);
+}
 
 .badge-overdue {
   background: #fef2f2;
   color: #b91c1c;
   border: 1px solid #fecaca;
+}
+.dark .badge-overdue {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.2);
 }
 
 /* ─── Table Responsive ───────────────────────────────────────────── */
