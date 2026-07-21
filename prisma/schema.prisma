@@ -1,4 +1,3 @@
-// Prisma Schema for Cred91 LMS — Loan Origination & Management System
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,7 +8,130 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ─── Enums ──────────────────────────────────────────────────────────
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role          @default(BORROWER)
+  phone        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+
+  @@map("users")
+}
+
+model Application {
+  id             String            @id @default(cuid())
+  userId         String
+  fullName       String
+  dateOfBirth    DateTime
+  address        String
+  phone          String
+  employmentType String
+  employer       String?
+  monthlyIncome  Float
+  yearsEmployed  Float
+  amount         Float
+  tenure         Int               @default(12)
+  purpose        String
+  interestRate   Float             @default(12.0)
+  creditScore    Int?
+  status         ApplicationStatus @default(PENDING)
+  reviewNote     String?
+  reviewedBy     String?
+  reviewedAt     DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents      Document[]
+  loan           Loan?
+
+  @@map("applications")
+}
+
+model Document {
+  id            String       @id @default(cuid())
+  applicationId String
+  type          DocumentType
+  fileName      String
+  fileUrl       String
+  fileSize      Int?
+  uploadedAt    DateTime     @default(now())
+  application   Application  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+model Loan {
+  id                 String        @id @default(cuid())
+  applicationId      String        @unique
+  principal          Float
+  interestRate       Float
+  tenureMonths       Int
+  monthlyEMI         Float
+  totalInterest      Float
+  totalAmount        Float
+  outstandingBalance Float
+  status             LoanStatus    @default(ACTIVE)
+  disbursedAt        DateTime      @default(now())
+  closedAt           DateTime?
+  delinquentNotes    String?
+  escrowBalance      Float         @default(0)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  emis               EMI[]
+  escrowEntries      EscrowEntry[]
+  application        Application   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  transactions       Transaction[]
+
+  @@map("loans")
+}
+
+model EMI {
+  id                 String       @id @default(cuid())
+  loanId             String
+  emiNumber          Int
+  dueDate            DateTime
+  principalComponent Float
+  interestComponent  Float
+  amount             Float
+  outstandingAfter   Float
+  status             EMIStatus    @default(DUE)
+  paidAt             DateTime?
+  loan               Loan         @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  transaction        Transaction?
+
+  @@map("emis")
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  loanId    String
+  emiId     String?  @unique
+  amount    Float
+  method    String   @default("ONLINE")
+  paidAt    DateTime @default(now())
+  reference String?
+  emi       EMI?     @relation(fields: [emiId], references: [id])
+  loan      Loan     @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+model EscrowEntry {
+  id           String          @id @default(cuid())
+  loanId       String
+  type         EscrowEntryType
+  amount       Float
+  description  String?
+  balanceAfter Float
+  createdAt    DateTime        @default(now())
+  loan         Loan            @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("escrow_entries")
+}
 
 enum Role {
   BORROWER
@@ -45,160 +167,4 @@ enum DocumentType {
 enum EscrowEntryType {
   DEPOSIT
   WITHDRAWAL
-}
-
-// ─── Models ─────────────────────────────────────────────────────────
-
-model User {
-  id           String        @id @default(cuid())
-  name         String
-  email        String        @unique
-  password     String
-  role         Role          @default(BORROWER)
-  phone        String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  applications Application[]
-
-  @@map("users")
-}
-
-model Application {
-  id String @id @default(cuid())
-
-  // ── Relationship to user
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // ── Personal information
-  fullName    String
-  dateOfBirth DateTime
-  address     String
-  phone       String
-
-  // ── Employment & income
-  employmentType String // SALARIED | SELF_EMPLOYED | BUSINESS
-  employer       String?
-  monthlyIncome  Float
-  yearsEmployed  Float
-
-  // ── Loan request details
-  amount       Float
-  tenure       Int     @default(12) // months
-  purpose      String
-  interestRate Float   @default(12.0) // annual %
-
-  // ── Credit scoring & review
-  creditScore Int?
-  status      ApplicationStatus @default(PENDING)
-  reviewNote  String?
-  reviewedBy  String?
-  reviewedAt  DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // ── Relations
-  documents Document[]
-  loan      Loan?
-
-  @@map("applications")
-}
-
-model Document {
-  id            String       @id @default(cuid())
-  applicationId String
-  application   Application  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  type          DocumentType
-  fileName      String
-  fileUrl       String
-  fileSize      Int?
-  uploadedAt    DateTime     @default(now())
-
-  @@map("documents")
-}
-
-model Loan {
-  id            String      @id @default(cuid())
-  applicationId String      @unique
-  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-
-  // ── Core financials
-  principal          Float
-  interestRate       Float // annual percentage
-  tenureMonths       Int
-  monthlyEMI         Float
-  totalInterest      Float
-  totalAmount        Float
-  outstandingBalance Float
-
-  // ── Status & dates
-  status      LoanStatus @default(ACTIVE)
-  disbursedAt DateTime   @default(now())
-  closedAt    DateTime?
-
-  // ── Delinquency
-  delinquentNotes String?
-
-  // ── Escrow
-  escrowBalance Float @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // ── Relations
-  emis          EMI[]
-  transactions  Transaction[]
-  escrowEntries EscrowEntry[]
-
-  @@map("loans")
-}
-
-model EMI {
-  id     String @id @default(cuid())
-  loanId String
-  loan   Loan   @relation(fields: [loanId], references: [id], onDelete: Cascade)
-
-  emiNumber          Int
-  dueDate            DateTime
-  principalComponent Float
-  interestComponent  Float
-  amount             Float // total EMI amount (principal + interest)
-  outstandingAfter   Float // outstanding balance after this EMI is paid
-
-  status EMIStatus @default(DUE)
-  paidAt DateTime?
-
-  transaction Transaction?
-
-  @@map("emis")
-}
-
-model Transaction {
-  id     String @id @default(cuid())
-  loanId String
-  loan   Loan   @relation(fields: [loanId], references: [id], onDelete: Cascade)
-  emiId  String? @unique
-  emi    EMI?   @relation(fields: [emiId], references: [id])
-
-  amount    Float
-  method    String   @default("ONLINE") // ONLINE | BANK_TRANSFER | CASH | UPI
-  paidAt    DateTime @default(now())
-  reference String?
-
-  @@map("transactions")
-}
-
-model EscrowEntry {
-  id     String @id @default(cuid())
-  loanId String
-  loan   Loan   @relation(fields: [loanId], references: [id], onDelete: Cascade)
-
-  type         EscrowEntryType
-  amount       Float
-  description  String?
-  balanceAfter Float
-  createdAt    DateTime @default(now())
-
-  @@map("escrow_entries")
 }
